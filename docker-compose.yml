@@ -1,0 +1,34 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # The Ingestion API Service
+  api:
+    build:
+      context: .
+      dockerfile: ingestion-api/Dockerfile
+    ports:
+      - "4000:8080" # Map host port 4000 to container port 8080
+    environment:
+      - REDIS_URL=${REDIS_URL}
+    depends_on:
+      - redis
+    command: npm run start:api
+
+  # The Database Worker Service
+  worker:
+    build:
+      context: .
+      dockerfile: database-worker/Dockerfile
+    environment:
+      - REDIS_URL=${REDIS_URL}
+      - MONGO_URI=${MONGODB_URI}
+    depends_on:
+      - redis
+    command: npm run start:worker
+
+  # A Redis service for local testing
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
