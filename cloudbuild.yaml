@@ -41,7 +41,7 @@ images:
     - 'managed'
     - '--allow-unauthenticated'
     - '--set-env-vars'
-    - 'REDIS_URL=redis://YOUR_REDIS_IP:6379,MONGODB_URI=YOUR_MONGO_URI'
+    - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
 # 5. Deploy the Worker Service to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -58,8 +58,9 @@ images:
     - 'managed'
     - '--no-allow-unauthenticated'
     - '--set-env-vars'
-    - 'REDIS_URL=redis://YOUR_REDIS_IP:6379,MONGODB_URI=YOUR_MONGO_URI'
+    - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
 # Options to fix logging permissions
 options:
   logging: CLOUD_LOGGING_ONLY
+
