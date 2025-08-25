@@ -1,28 +1,65 @@
-# cloudbuild.yaml
+# FILE: cloudbuild.yaml
+
 steps:
-  # Build the API image using the 'api' stage from our Dockerfile
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--target=api'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
-      - '.'
+# 1. Build the API image using the 'api' stage
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '--target=api'
+    - '-t'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+    - '.'
 
-  # Build the Worker image using the 'worker' stage from our Dockerfile
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--target=worker'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
-      - '.'
+# 2. Build the Worker image using the 'worker' stage
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '--target=worker'
+    - '-t'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+    - '.'
 
-# Push both images to the Artifact Registry
+# 3. Push both images to Artifact Registry (this happens automatically after build steps)
 images:
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
 
-  # ADD THIS BLOCK TO FIX THE ERROR
+# --- DEPLOY STEPS (Add this section) ---
+
+# 4. Deploy the API Service to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'dataloggerapi' # Your API service name
+    - '--image'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+    - '--region'
+    - 'europe-west1'
+    - '--platform'
+    - 'managed'
+    - '--allow-unauthenticated'
+    - '--set-env-vars'
+    - 'REDIS_URL=redis://YOUR_REDIS_IP:6379,MONGODB_URI=YOUR_MONGO_URI'
+
+# 5. Deploy the Worker Service to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'dataloggerworker' # Your worker service name
+    - '--image'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+    - '--region'
+    - 'europe-west1'
+    - '--platform'
+    - 'managed'
+    - '--no-allow-unauthenticated'
+    - '--set-env-vars'
+    - 'REDIS_URL=redis://YOUR_REDIS_IP:6379,MONGODB_URI=YOUR_MONGO_URI'
+
+# Options to fix logging permissions
 options:
   logging: CLOUD_LOGGING_ONLY
