@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "server.js",
   "type": "module",
-  "scripts": {
+"scripts": {
     "start:api": "node ingestion-api/server.js",
     "dev:api": "nodemon ingestion-api/server.js",
     "start:worker": "node database-worker/worker.js",
-    "dev:worker": "nodemon database-worker/worker.js"
+    "dev:worker": "nodemon database-worker/worker.js",
+    "build": "echo \"Build complete. No compilation needed.\""
   },
   "keywords": [],
   "author": "",
