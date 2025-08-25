@@ -1,0 +1,28 @@
+# cloudbuild.yaml
+steps:
+  # Build the API image using the 'api' stage from our Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--target=api'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+      - '.'
+
+  # Build the Worker image using the 'worker' stage from our Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--target=worker'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+      - '.'
+
+# Push both images to the Artifact Registry
+images:
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+
+  # ADD THIS BLOCK TO FIX THE ERROR
+options:
+  logging: CLOUD_LOGGING_ONLY
