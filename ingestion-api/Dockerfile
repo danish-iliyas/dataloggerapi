@@ -1,24 +1,22 @@
-# Use the official Node.js v22 runtime
-FROM node:22-slim
+# FILE: ingestion-api/Dockerfile
 
-# Set the working directory inside the container
+# Use an official Node.js runtime as a parent image
+FROM node:18-slim
+
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the root package.json and install all dependencies.
-# This leverages Docker's layer caching for faster builds.
-COPY ../package*.json ./
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install app dependencies
 RUN npm install
 
-# Copy the API-specific source code into the container
+# Copy app source code
 COPY . .
 
-# Copy the shared code folder into the container
-COPY ../shared ./shared
-
-# Your app binds to port 8080, which Cloud Run will automatically
-# map to the public-facing port 443 for HTTPS.
-ENV PORT 8080
+# Expose the port the app runs on
 EXPOSE 8080
 
-# Define the command to run your API service
-CMD [ "npm", "run", "start:api" ]
+# Define the command to run the app
+CMD [ "node", "server.js" ]
