@@ -10,7 +10,7 @@ steps:
     - 'build'
     - '-t'
     - 'gcr.io/775014090096/dataloggerapi:latest'
-    - '--file=ingestion-api/Dockerfile' # Dockerfile for the API
+    - '--file=ingestion-api/Dockerfile' # Correctly points to the API Dockerfile
     - '.'
 
 # 2. Build the Worker container image
@@ -20,7 +20,7 @@ steps:
     - 'build'
     - '-t'
     - 'gcr.io/775014090096/dataloggerworker:latest'
-    - '--file=database-worker/Dockerfile' # Dockerfile for the Worker
+    - '--file=database-worker/Dockerfile' # Correctly points to the Worker Dockerfile
     - '.'
 
 # --- PUSH STEPS ---
@@ -44,16 +44,16 @@ steps:
   args:
     - 'run'
     - 'deploy'
-    - 'dataloggerapi' # Service name for the API
+    - 'dataloggerapi'
     - '--image'
     - 'gcr.io/775014090096/dataloggerapi:latest'
     - '--region'
     - 'europe-west1'
     - '--platform'
     - 'managed'
-    - '--allow-unauthenticated' # Makes the API public
+    - '--allow-unauthenticated'
     - '--set-env-vars'
-    - 'REDIS_URL=redis://YOUR_REDIS_IP:6379' # IMPORTANT: Set Redis URL
+    - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367'
 
 # 6. Deploy the Worker Service to Cloud Run (Private)
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -62,16 +62,16 @@ steps:
   args:
     - 'run'
     - 'deploy'
-    - 'dataloggerworker' # A separate service name for the Worker
+    - 'dataloggerworker'
     - '--image'
     - 'gcr.io/775014090096/dataloggerworker:latest'
     - '--region'
     - 'europe-west1'
     - '--platform'
     - 'managed'
-    - '--no-allow-unauthenticated' # Makes the worker private
+    - '--no-allow-unauthenticated'
     - '--set-env-vars'
-    - 'REDIS_URL=redis://YOUR_REDIS_IP:6379,MONGODB_URI=YOUR_MONGO_URI' # IMPORTANT: Set Redis and Mongo URLs
+    - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367'
 
 # List all the images that were built
 images:
