@@ -1,0 +1,26 @@
+{
+  "name": "dseloggerapi",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start:api": "node ingestion-api/server.js",
+    "dev:api": "nodemon ingestion-api/server.js",
+    "start:worker": "node database-worker/worker.js",
+    "dev:worker": "nodemon database-worker/worker.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bullmq": "^5.58.1",
+    "dayjs": "^1.11.13",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
