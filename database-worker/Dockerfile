@@ -1,18 +1,20 @@
-# Use the official Node.js v22 runtime
-FROM node:22-slim
+# FILE: database-worker/Dockerfile
 
-# Set the working directory inside the container
+# Use an official Node.js runtime as a parent image
+FROM node:18-slim
+
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the root package.json and install all dependencies
-COPY ../package*.json ./
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install app dependencies
 RUN npm install
 
-# Copy the Worker-specific source code into the container
+# Copy app source code
 COPY . .
 
-# Copy the shared code folder into the container
-COPY ../shared ./shared
-
-# Define the command to run your worker service
+# Define the command to run the worker
+# (You may need to adjust this if your start command is different)
 CMD [ "npm", "run", "start:worker" ]
