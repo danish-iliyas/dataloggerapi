@@ -23,6 +23,6 @@ images:
   - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
   - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
 
-  # ADD THIS BLOCK TO FIX THE ERRORlll
+  # ADD THIS BLOCK TO FIX THE ERROR
 options:
   logging: CLOUD_LOGGING_ONLY
