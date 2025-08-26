@@ -1,61 +1,60 @@
 steps:
-# 1. Build the API image
+# 1. Build the API image and push to the EUROPE repository
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'build'
     - '--target=api'
     - '-t'
-    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+    - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/ingestion-api:latest' # <-- CHANGED
     - '.'
 
-# 2. Build the Worker image
+# 2. Build the Worker image and push to the EUROPE repository
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'build'
     - '--target=worker'
     - '-t'
-    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+    - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/database-worker:latest' # <-- CHANGED
     - '.'
 
-# 4. Deploy the API Service
+# 3. Deploy the API Service from the EUROPE repository
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
   args:
     - 'run'
     - 'deploy'
-    - 'dataloggerapi' # This must be a simple string
+    - 'dataloggerapi'
     - '--image'
-    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+    - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/ingestion-api:latest' # <-- CHANGED
     - '--region'
-    - 'europe-west1'
+    - 'europe-west1' # This is correct
     - '--platform'
     - 'managed'
     - '--allow-unauthenticated'
     - '--set-env-vars'
     - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
-# 5. Deploy the Worker Service
+# 4. Deploy the Worker Service from the EUROPE repository
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
   args:
     - 'run'
     - 'deploy'
-    - 'dataloggerworker' # This must be a simple string
+    - 'dataloggerworker'
     - '--image'
-    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+    - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/database-worker:latest' # <-- CHANGED
     - '--region'
-    - 'europe-west1'
+    - 'europe-west1' # This is correct
     - '--platform'
     - 'managed'
     - '--no-allow-unauthenticated'
     - '--set-env-vars'
     - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
-# Push images to Artifact Registry
+# 5. List the images that will be pushed to the EUROPE repository
 images:
-- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
-- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+- 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/ingestion-api:latest' # <-- CHANGED
+- 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/database-worker:latest' # <-- CHANGED
 
-# Options for logging
 options:
   logging: CLOUD_LOGGING_ONLY
