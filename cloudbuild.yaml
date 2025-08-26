@@ -1,7 +1,5 @@
-# FILE: cloudbuild.yaml
-
 steps:
-# 1. Build the API image using the 'api' stage
+# 1. Build the API image
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'build'
@@ -10,7 +8,7 @@ steps:
     - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
     - '.'
 
-# 2. Build the Worker image using the 'worker' stage
+# 2. Build the Worker image
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'build'
@@ -19,20 +17,13 @@ steps:
     - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
     - '.'
 
-# 3. Push both images to Artifact Registry (this happens automatically after build steps)
-images:
-- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
-- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
-
-# --- DEPLOY STEPS (Add this section) ---
-
-# 4. Deploy the API Service to Cloud Run
+# 4. Deploy the API Service
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
   args:
     - 'run'
     - 'deploy'
-    - 'dataloggerapi' # Your API service name
+    - 'dataloggerapi' # This must be a simple string
     - '--image'
     - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
     - '--region'
@@ -43,13 +34,13 @@ images:
     - '--set-env-vars'
     - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
-# 5. Deploy the Worker Service to Cloud Run
+# 5. Deploy the Worker Service
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
   args:
     - 'run'
     - 'deploy'
-    - 'dataloggerworker' # Your worker service name
+    - 'dataloggerworker' # This must be a simple string
     - '--image'
     - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
     - '--region'
@@ -60,7 +51,11 @@ images:
     - '--set-env-vars'
     - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
-# Options to fix logging permissions
+# Push images to Artifact Registry
+images:
+- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
+- 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+
+# Options for logging
 options:
   logging: CLOUD_LOGGING_ONLY
-
