@@ -22,16 +22,3 @@ COPY ./shared ./shared
 ENV PORT 8080
 EXPOSE 8080
 CMD [ "npm", "run", "start:api" ]
-
-# ---- Worker Build Stage ----
-# This stage creates the final, lean image for your worker.
-FROM node:22-slim AS worker
-WORKDIR /usr/src/app
-# Copy dependencies from the 'base' stage
-COPY --from=base /usr/src/app/node_modules ./node_modules
-# Copy only the necessary source code for the worker
-COPY ./package.json ./
-COPY ./database-worker ./database-worker
-COPY ./shared ./shared
-
-CMD [ "npm", "run", "start:worker" ]
