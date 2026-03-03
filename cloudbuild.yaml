@@ -1,28 +1,36 @@
-# cloudbuild.yaml
 steps:
-  # Build the API image using the 'api' stage from our Dockerfile
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--target=api'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
-      - '.'
+# 1. Build the API image and push to the EUROPE repository
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '--target=api'
+    - '-t'
+    - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/ingestion-api:latest' # <-- CHANGED
+    - '.'
 
-  # Build the Worker image using the 'worker' stage from our Dockerfile
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--target=worker'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
-      - '.'
+# 2. Deploy the API Service from the EUROPE repository
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'dataloggerapi'
+    - '--image'
+    - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/ingestion-api:latest' # <-- CHANGED
+    - '--region'
+    - 'europe-west1' # This is correct
+    - '--platform'
+    - 'managed'
+    - '--allow-unauthenticated'
+    - '--set-env-vars'
+    - 'REDIS_URL=redis://default:spKR06XpWueVQCms3ai7oNXlC1SQlAj1@redis-18367.c114.us-east-1-4.ec2.redns.redis-cloud.com:18367,MONGODB_URI=mongodb+srv://Waqar:DSE%40123Emsas@cluster0.wl6kg82.mongodb.net/myDatabase?retryWrites=true&w=majority'
 
-# Push both images to the Artifact Registry
+
+# 3. List the images that will be pushed to the EUROPE repository
 images:
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/ingestion-api:latest'
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo/database-worker:latest'
+- 'europe-west1-docker.pkg.dev/${PROJECT_ID}/dselogger-repo-europe/ingestion-api:latest' # <-- CHANGED
 
-  # ADD THIS BLOCK TO FIX THE ERROR
+
 options:
   logging: CLOUD_LOGGING_ONLY
+
